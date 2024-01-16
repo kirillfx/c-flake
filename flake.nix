@@ -33,6 +33,14 @@
         '';
       in
       {
+        defaultPackage."${system}" =
+          p.clangStdenv.mkDerivation {
+            name = "hello";
+            src = self;
+            buildPhase = "mk -o main src/main";
+            installPhase = "mkdir -p $out/bin; install -t $out/bin hello; chmod +x $out/bin/hello";
+          };
+      
         devShell = p.mkShell.override { stdenv = p.clangStdenv; } rec {
           packages = with p; [
             # builder
