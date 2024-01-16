@@ -10,8 +10,9 @@
     utils.lib.eachDefaultSystem (
       system:
       let
-        p = import nixpkgs { inherit system; };
-        llvm = p.llvmPackages_latest;
+        pkgs = import nixpkgs { inherit system;};
+        
+        llvm = pkgs.llvmPackages_latest;
 
         # simple script which replaces the functionality of make
         # it works with <math.h> and includes debugging symbols by default
@@ -19,7 +20,7 @@
 
         # arguments: outfile
         # basic usage example: mk main [flags]
-        mymake = p.writeShellScriptBin "mk" ''
+        mymake = pkgs.writeShellScriptBin "mk" ''
           if [ -f "$1.c" ]; then
             i="$1.c"
             c=$CC
@@ -33,16 +34,25 @@
         '';
       in
       {
-        defaultPackage."${system}" =
-          p.clangStdenv.mkDerivation {
-            name = "hello";
+        defaultPackage =
+          pkgs.clangStdenv.mkDerivation {
+            name = "main";
             src = self;
-            buildPhase = "mk -o main src/main";
-            installPhase = "mkdir -p $out/bin; install -t $out/bin hello; chmod +x $out/bin/hello";
+            nativeBuildInputs = [ mymake ];
+            buildPhase = "mk src/main -o main";
+            installPhase = ''
+              mkdir -p $out/bin
+              install -t $out/bin main
+              chmod +x $out/bin/main
+            '';
           };
+
+        nativeBuildInputs = [
+          mymake
+        ];
       
-        devShell = p.mkShell.override { stdenv = p.clangStdenv; } rec {
-          packages = with p; [
+        devShell = pkgs.mkShell.override { stdenv = pkgs.clangStdenv; } rec {
+          packages = with pkgs; [
             # builder
             gnumake
             cmake
