@@ -40,14 +40,13 @@
           # rec used so we can refer to field inside phases
           pkgs.clangStdenv.mkDerivation rec {
             name = "my-app";
-            execName = pkgs.lib.stringAsChars (x: if x == "-" then "_" else x) name;
             src = self;
             nativeBuildInputs = [ mymake ];
-            buildPhase = "mk src/main -o ${execName}";
+            buildPhase = "mk src/main -o ${name}";
             installPhase = ''
               mkdir -p $out/bin
-              install -t $out/bin ${execName}
-              chmod +x $out/bin/${execName}
+              install -t $out/bin ${name}
+              chmod +x $out/bin/${name}
             '';
           };
 
