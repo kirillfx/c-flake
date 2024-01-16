@@ -1,8 +1,10 @@
 {
-  description = "C/C++ environment";
+  description = ''
+    Trivial C project template
+  '';
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
     utils.url = "github:numtide/flake-utils";
   };
 
@@ -10,7 +12,7 @@
     utils.lib.eachDefaultSystem (
       system:
       let
-        pkgs = import nixpkgs { inherit system;};
+        pkgs = import nixpkgs { inherit system; };
         
         llvm = pkgs.llvmPackages_latest;
 
@@ -35,15 +37,17 @@
       in
       {
         defaultPackage =
-          pkgs.clangStdenv.mkDerivation {
-            name = "main";
+          # rec used so we can refer to field inside phases
+          pkgs.clangStdenv.mkDerivation rec {
+            name = "my-app";
+            execName = pkgs.lib.stringAsChars (x: if x == "-" then "_" else x) name;
             src = self;
             nativeBuildInputs = [ mymake ];
-            buildPhase = "mk src/main -o main";
+            buildPhase = "mk src/main -o ${execName}";
             installPhase = ''
               mkdir -p $out/bin
-              install -t $out/bin main
-              chmod +x $out/bin/main
+              install -t $out/bin ${execName}
+              chmod +x $out/bin/${execName}
             '';
           };
 
@@ -78,9 +82,6 @@
             llvm.libcxx
               
             # libs
-            # glm
-            # SDL2
-            # SDL2_gfx
           ];
           name = "C";
         };
