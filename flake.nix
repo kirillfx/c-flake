@@ -49,6 +49,7 @@
             # builder
             gnumake
             cmake
+            cmake-language-server
             bear
 
             # debugger
