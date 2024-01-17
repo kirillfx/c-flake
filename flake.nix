@@ -40,25 +40,16 @@
           # rec used so we can refer to field inside phases
           pkgs.clangStdenv.mkDerivation rec {
             name = "my-app";
-            src = self;
-            nativeBuildInputs = [ mymake ];
-            buildPhase = "mk src/main -o ${name}";
-            installPhase = ''
-              mkdir -p $out/bin
-              install -t $out/bin ${name}
-              chmod +x $out/bin/${name}
-            '';
+            src = ./.;
+            nativeBuildInputs = [ pkgs.cmake ];
           };
 
-        nativeBuildInputs = [
-          mymake
-        ];
-      
         devShell = pkgs.mkShell.override { stdenv = pkgs.clangStdenv; } rec {
           packages = with pkgs; [
             # builder
             gnumake
             cmake
+            cmake-language-server
             bear
 
             # debugger
