@@ -44,10 +44,6 @@
             nativeBuildInputs = [ pkgs.cmake ];
           };
 
-        nativeBuildInputs = [
-          mymake
-        ];
-      
         devShell = pkgs.mkShell.override { stdenv = pkgs.clangStdenv; } rec {
           packages = with pkgs; [
             # builder
