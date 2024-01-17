@@ -40,11 +40,11 @@
           # rec used so we can refer to field inside phases
           pkgs.clangStdenv.mkDerivation rec {
             name = "my-app";
-            src = ./.;
+            src = self;
             nativeBuildInputs = [ pkgs.cmake ];
             # buildPhase = "mk src/main -o ${name}";
             buildPhase = '' 
-              mkdir -p build
+              mkdir build
               cmake -S . -B build
               cmake --build build
             '';
